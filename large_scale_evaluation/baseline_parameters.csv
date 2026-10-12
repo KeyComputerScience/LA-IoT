@@ -1,0 +1,6 @@
+algorithm,claimed_nist_category,security_model,public_key_bytes,kem_ciphertext_bytes,shared_secret_bytes,version_basis,source_url
+ML-KEM-768,3,IND-CCA2,1184,1088,32,FIPS203,https://openquantumsafe.org/liboqs/algorithms/kem/ml-kem.html
+HQC-3,3,IND-CCA2,4514,8978,32,2025-08-22 spec in liboqs 0.16.0,https://openquantumsafe.org/liboqs/algorithms/kem/hqc.html
+FrodoKEM-976-SHAKE,3,IND-CCA2,15632,15792,24,salted FrodoKEM in liboqs 0.16.0,https://openquantumsafe.org/liboqs/algorithms/kem/frodokem.html
+NTRU-HPS-2048-677,3,IND-CCA2,930,930,32,liboqs 0.16.0,https://openquantumsafe.org/liboqs/algorithms/kem/ntru.html
+Classic-McEliece-460896,3,IND-CCA2,524160,156,32,liboqs 0.16.0,https://openquantumsafe.org/liboqs/algorithms/kem/classic_mceliece.html

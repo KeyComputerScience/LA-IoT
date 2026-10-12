@@ -1,0 +1,6 @@
+# Generated only. No dependencies have been installed.
+cryptography>=47
+matplotlib>=3.8
+tenseal
+# Install official liboqs-python separately against pinned liboqs 0.16.0.
+# Do not replace it with the unrelated PyPI package named oqs.
