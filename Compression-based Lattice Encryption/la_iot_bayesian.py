@@ -12,14 +12,17 @@ adds the sufficient statistics [tau_i*x_i[0], ..., tau_i*x_i[3], tau_i]. The
 authorized decryptor obtains the exact rational posterior means and variance
 using Fraction.
 
-Sensitive reports (alpha=beta=1) use the accompanying custom Ring-LWE
-encryption and a removable, authenticated marker. A trusted
-controller sees these individual plaintext readings, checks the marker, and
-re-encrypts their sufficient statistics under the common BFV public key.
+Sensitive reports (alpha=beta=1) use a unified watermark-and-compression
+unit: losslessly compress the reading bytes, retain their lengths and codec,
+pad the storage area to the original length, and authenticate the full unit
+using a fresh 16-byte random nonce and a 16-byte HMAC-SHA256 tag.
+Ring-LWE encrypts this unit. A trusted controller decrypts it, verifies its
+authentication, removes its padding, and decompresses the original readings
+before re-encrypting their statistics under the common BFV public key.
 Non-sensitive reports (alpha=beta=0) already contain BFV statistics. Both
 paths use adaptive, lossless byte compression and a per-device source MAC.
 
-The marker is a removable authenticated byte frame. TenSEAL BFV operates in
+The combined unit is a removable authenticated byte frame. TenSEAL BFV operates in
 leveled mode, using addition of integer statistics without bootstrapping.
 The configured bounds prevent plaintext modular wraparound. Ring-LWE uses
 the parameters and coefficient compression defined in the companion module.
@@ -38,6 +41,7 @@ from fractions import Fraction
 import hashlib
 import hmac
 import json
+import secrets
 import struct
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
@@ -46,10 +50,13 @@ import zlib
 import la_iot_ring_lwe as lattice
 
 
-VERSION = 1
+VERSION = 2
 MAX_RAW_BYTES = 2 * 1024 * 1024
 MAX_PACKET_BYTES = 4 * 1024 * 1024
-MARKER_MAGIC = b"LAWM"
+MARKER_MAGIC = b"LACW"
+MARKER_PREFIX_BYTES = 13
+MARKER_NONCE_BYTES = 16
+MARKER_TAG_BYTES = 16
 TAG_BYTES = 32
 SOURCE_DOMAIN = b"LA-IoT/BAYES/v1/source\x00"
 MARKER_DOMAIN = b"LA-IoT/BAYES/v1/marker\x00"
@@ -125,28 +132,48 @@ def _marker_binding(header: Mapping[str, Any]) -> bytes:
 
 
 def _embed_marker(payload: bytes, psk: bytes, header: Mapping[str, Any]) -> bytes:
-    prefix = MARKER_MAGIC + len(payload).to_bytes(4, "big") + payload
+    """Create one compressed unit authenticated by nonce-bound RandomMAC."""
+    codec, stored = adaptive_compress(payload)
+    codec_id = 0 if codec == "identity" else 1
+    nonce = secrets.token_bytes(MARKER_NONCE_BYTES)
+    storage = stored + bytes(len(payload) - len(stored))
+    prefix = (MARKER_MAGIC + bytes([codec_id]) + len(payload).to_bytes(4, "big")
+              + len(stored).to_bytes(4, "big") + nonce + storage)
     binding = _marker_binding(header)
     tag = hmac.new(_purpose_key(psk, b"marker"),
                    MARKER_DOMAIN + len(binding).to_bytes(4, "big") + binding + prefix,
-                   hashlib.sha256).digest()
+                   hashlib.sha256).digest()[:MARKER_TAG_BYTES]
     return prefix + tag
 
 
 def _remove_marker(frame: bytes, psk: bytes, header: Mapping[str, Any]) -> bytes:
-    if len(frame) < 8 + TAG_BYTES or frame[:4] != MARKER_MAGIC:
+    """Authenticate the complete unit, then restore its original reading bytes."""
+    if len(frame) < MARKER_PREFIX_BYTES + MARKER_NONCE_BYTES + MARKER_TAG_BYTES:
         raise ValueError("Invalid marker frame")
-    payload_len = int.from_bytes(frame[4:8], "big")
-    if payload_len + 8 + TAG_BYTES != len(frame):
-        raise ValueError("Invalid marker-frame length")
-    prefix, received_tag = frame[:-TAG_BYTES], frame[-TAG_BYTES:]
+    prefix, received_tag = frame[:-MARKER_TAG_BYTES], frame[-MARKER_TAG_BYTES:]
     binding = _marker_binding(header)
     expected = hmac.new(_purpose_key(psk, b"marker"),
                         MARKER_DOMAIN + len(binding).to_bytes(4, "big") + binding + prefix,
-                        hashlib.sha256).digest()
+                        hashlib.sha256).digest()[:MARKER_TAG_BYTES]
     if not hmac.compare_digest(received_tag, expected):
         raise ValueError("Marker authentication failed")
-    return prefix[8:]
+    if prefix[:4] != MARKER_MAGIC:
+        raise ValueError("Invalid watermark-compression identifier")
+    codec_id = prefix[4]
+    raw_len = int.from_bytes(prefix[5:9], "big")
+    stored_len = int.from_bytes(prefix[9:13], "big")
+    _require_int(raw_len, "watermark raw_len", 1, MAX_RAW_BYTES)
+    storage_start = MARKER_PREFIX_BYTES + MARKER_NONCE_BYTES
+    if len(prefix) != storage_start + raw_len:
+        raise ValueError("Invalid watermark-compression frame length")
+    _require_int(stored_len, "watermark stored_len", 1, raw_len)
+    storage = prefix[storage_start:]
+    if any(storage[stored_len:]):
+        raise ValueError("Nonzero watermark-compression storage padding")
+    if codec_id not in (0, 1):
+        raise ValueError("Unsupported watermark-compression codec")
+    codec = "identity" if codec_id == 0 else "zlib"
+    return _decompress(codec, storage[:stored_len], raw_len)
 
 
 def adaptive_compress(raw: bytes) -> tuple[str, bytes]:
@@ -218,7 +245,8 @@ class ProtocolConfig:
 
     @property
     def sensitive_frame_bytes(self) -> int:
-        return 8 + self.sensitive_payload_bytes + TAG_BYTES
+        return (MARKER_PREFIX_BYTES + MARKER_NONCE_BYTES
+                + self.sensitive_payload_bytes + MARKER_TAG_BYTES)
 
 
 @dataclass(frozen=True)
