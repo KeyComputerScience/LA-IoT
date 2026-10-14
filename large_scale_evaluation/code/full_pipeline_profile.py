@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Updated to the canonical package and explicit integer-precision profiles.
 """Explicit host profiling of the existing complete ML-KEM/BFV processing path.
 
 Generated as source only: not executed, imported, compiled, or tested.
@@ -31,14 +33,18 @@ def main() -> None:
     parser.add_argument("--sensitive-fraction", type=float, default=0.5)
     parser.add_argument("--seed", type=int, default=20261012)
     parser.add_argument("--no-relay-partials", action="store_true")
+    parser.add_argument("--precision-file", type=Path,
+                        help="JSON mapping each source ID to its calibrated integer precision")
+    parser.add_argument("--plain-modulus", type=int, default=1032193)
     parser.add_argument("--protocol-dir", type=Path,
-                        default=Path(__file__).resolve().parent / "protocol")
+                        default=Path(__file__).resolve().parents[2] / "src",
+                        help="Canonical checkout src directory")
     args = parser.parse_args()
     if (not 1 <= args.sources <= 5000 or args.rounds < 1
             or not 0 <= args.sensitive_fraction <= 1 or not args.run_id.strip()):
         parser.error("Invalid source count, round count, fraction, or run ID")
     sys.path.insert(0, str(args.protocol_dir.resolve()))
-    import security_mechanism_workflow as workflow
+    from laiot import security_mechanism_workflow as workflow
     args.output.mkdir(parents=True, exist_ok=False)
     records = []
 
@@ -55,8 +61,15 @@ def main() -> None:
     rng = random.Random(args.seed)  # Workload only; never a cryptographic RNG.
     n_sensitive = int(args.sources * args.sensitive_fraction + 0.5)
     sensitive = set(rng.sample(nodes, n_sensitive))
-    policies = {node: workflow.NodePolicy(int(node in sensitive), 1) for node in nodes}
-    cfg = workflow.ProtocolConfig(max_nodes=args.sources)
+    precisions = ({node: 1 for node in nodes} if args.precision_file is None
+                  else json.loads(args.precision_file.read_text(encoding="utf-8")))
+    if (not isinstance(precisions, dict) or set(precisions) != set(nodes)
+            or any(type(value) is not int or value < 1 for value in precisions.values())):
+        parser.error("Precision file must assign one positive integer to every source")
+    policies = {node: workflow.NodePolicy(int(node in sensitive), precisions[node]) for node in nodes}
+    cfg = workflow.ProtocolConfig(max_nodes=args.sources,
+                                  max_precision=max(precisions.values()),
+                                  plain_modulus=args.plain_modulus)
     provisioning = measured("provisioning", "trusted_setup", workflow.provision, policies, cfg)
     # Export actual parameters or fail; do not guess a library's defaults.
     seal = provisioning.recipient.bfv_secret_context.seal_context().data
@@ -112,7 +125,8 @@ def main() -> None:
                 workflow.receive_authenticated_result,
                 recipient_store, provisioning.public, provisioning.recipient,
                 "controller-1", encoded, round_id, round_processor.spec_id,
-                nodes, round_id=round_id,
+                nodes, cfg.prior_precision + sum(p.precision for p in policies.values()),
+                round_id=round_id,
             )
             # Independent integer arithmetic; no BFV helper constructs the answer.
             denominator = cfg.prior_precision + sum(policies[node].precision for node in nodes)
@@ -135,7 +149,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(records)
     hashes = {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-              for path in args.protocol_dir.glob("*.py")}
+              for path in Path(workflow.__file__).parent.glob("*.py")}
     manifest = {"run_id": args.run_id, "scope": "serial_host_complete_processing_path",
                 "network_executed": False, "mcu_validated": False, "energy_measured": False,
                 "raw_reading_bytes": cfg.sensitive_payload_bytes,
@@ -146,6 +160,8 @@ def main() -> None:
                 "python": sys.version, "platform": platform.platform(),
                 "protocol_sha256": hashes, "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                 "synthetic_workload_sha256": workload_digest.hexdigest(), "correctness": correctness,
+                "precision_file_sha256": (hashlib.sha256(args.precision_file.read_bytes()).hexdigest()
+                                          if args.precision_file is not None else None),
                 "stage_csv_sha256": hashlib.sha256((args.output / "host_stage_profile.csv").read_bytes()).hexdigest(),
                 "no_private_key_or_plaintext_log": True}
     (args.output / "host_profile_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

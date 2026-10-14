@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "la-iot"
+version = "0.2.0"
+description = "Sensitivity-aware authenticated Bayesian fusion for IoT"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "LA-IoT contributors"}]
+dependencies = [
+    "cryptography>=47,<48",
+    "tenseal>=0.3.16,<0.4",
+    "aiocoap>=0.4.12,<0.5",
+]
+
+[project.optional-dependencies]
+analysis = ["numpy>=1.26,<3", "matplotlib>=3.8,<4"]
+serial = ["pyserial>=3.5,<4"]
+
+[project.scripts]
+laiot = "laiot.cli:main"
+
+[project.urls]
+Repository = "https://github.com/KeyComputerScience/LA-IoT"
+Issues = "https://github.com/KeyComputerScience/LA-IoT/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

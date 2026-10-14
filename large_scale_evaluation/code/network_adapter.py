@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Normalize actual Contiki/host JSON log lines and verify recorded artifacts.
 
 This adapter does not implement radio drivers, RPL, CoAP, clock synchronization,
@@ -15,17 +16,11 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import re
 import subprocess
 import sys
 
-PREFIX = "LAIOT_EVENT "
-EVENTS = {"SEND", "RECV", "VERIFY_OK", "VERIFY_FAIL", "AGGREGATE",
-          "REENCRYPT", "ROUND_RELEASE", "ROUND_COMPLETE", "ROUND_TIMEOUT",
-          "ROUND_REJECTED", "DROP", "COAP_BLOCK", "RADIO_FRAGMENT"}
-FIELDS = ("run_id", "seed", "node_id", "round_id", "sequence", "event",
-          "time_us", "clock_domain", "alpha", "beta", "wire_bytes",
-          "report_bytes", "block_id", "fragment_id", "report_hash", "detail")
-REQUIRED = {"run_id", "seed", "node_id", "round_id", "sequence", "event", "time_us", "clock_domain"}
+from laiot.events import EVENTS, FIELDS, PREFIX, REQUIRED, parse_event
 
 
 def sha256(path: Path) -> str:
@@ -42,38 +37,9 @@ def integer(value, name: str) -> int:
     return value
 
 
-def parse_event(line: str) -> dict | None:
-    position = line.find(PREFIX)
-    if position < 0:
-        return None
-    value = json.loads(line[position + len(PREFIX):])
-    if not isinstance(value, dict) or not REQUIRED.issubset(value) or set(value) - set(FIELDS):
-        raise ValueError("Unknown or missing event fields")
-    if value["event"] not in EVENTS:
-        raise ValueError("Unknown event type")
-    for key in ("run_id", "node_id", "round_id", "clock_domain"):
-        if not isinstance(value[key], str) or not value[key].strip():
-            raise ValueError(f"Missing string field: {key}")
-    for key in ("seed", "sequence", "time_us"):
-        integer(value[key], key)
-    for key in ("wire_bytes", "report_bytes", "block_id", "fragment_id"):
-        if key in value:
-            integer(value[key], key)
-    if "alpha" in value or "beta" in value:
-        if (type(value.get("alpha")) is not int or type(value.get("beta")) is not int
-                or value["alpha"] not in (0, 1) or value["beta"] != value["alpha"]):
-            raise ValueError("Use alpha=beta=1 or alpha=beta=0")
-    if value.get("report_hash"):
-        digest = value["report_hash"]
-        if not isinstance(digest, str) or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
-            raise ValueError("Invalid SHA-256 report hash")
-    if "detail" in value and not isinstance(value["detail"], str):
-        raise ValueError("Detail must be a text string")
-    return value
-
-
 def normalize(logs: list[Path], output: Path) -> dict:
-    rows, ignored, last_time = [], 0, {}
+    rows, ignored, last_time, stable_events = [], 0, {}, {}
+    repeated = 0
     for path in logs:
         with path.open(encoding="utf-8") as handle:
             for line_number, line in enumerate(handle, 1):
@@ -82,11 +48,22 @@ def normalize(logs: list[Path], output: Path) -> dict:
                     if event is None:
                         ignored += 1
                         continue
+                    if "event_id" in event:
+                        stable_key = (event["run_id"], event["event_id"])
+                        if stable_key in stable_events:
+                            if stable_events[stable_key] != event:
+                                raise ValueError("Stable event ID has conflicting log content")
+                            repeated += 1
+                            continue
+                        stable_events[stable_key] = dict(event)
                     key = (str(path.resolve()), event["run_id"], event["node_id"], event["clock_domain"])
                     if event["time_us"] < last_time.get(key, 0):
                         raise ValueError("Clock moved backwards; use a new domain after reset")
                     last_time[key] = event["time_us"]
-                    rows.append(event)
+                    row = dict(event)
+                    if "participants" in row:
+                        row["participants"] = json.dumps(row["participants"], separators=(",", ":"))
+                    rows.append(row)
                 except (ValueError, TypeError) as exc:
                     raise ValueError(f"{path}:{line_number}: {exc}") from exc
     with output.open("x", newline="", encoding="utf-8") as handle:
@@ -95,8 +72,90 @@ def normalize(logs: list[Path], output: Path) -> dict:
         writer.writerows(rows)
     return {"input_logs": [{"path": str(path.resolve()), "sha256": sha256(path)} for path in logs],
             "output_sha256": sha256(output), "events": len(rows), "ignored_lines": ignored,
+            "duplicate_durable_event_lines": repeated,
             "source_sha256": sha256(Path(__file__)),
             "warning": "No clock alignment, report authenticity, or firmware execution inferred."}
+
+
+ENERGEST_PREFIX = "LAIOT_ENERGEST "
+ENERGEST_FIELDS = ("run_id", "seed", "node_id", "clock_domain", "start_time_s",
+                  "end_time_s", "state", "delta_ticks", "ticks_per_second", "duration_s")
+ENERGEST_STATES = ("cpu", "lpm", "deep", "tx", "listen")
+
+
+def normalize_energest(logs: list[Path], output: Path, metadata_path: Path | None = None) -> dict:
+    """Convert cumulative Energest ticks to state durations, never to energy.
+
+    New firmware prints JSON with its own clock and ENERGEST_SECOND. Older
+    key=value lines need a metadata snapshots entry for each path/line with
+    independently recorded time_us, run_id, seed, clock_domain and tick rate.
+    Missing timestamps are not inferred from CPU counters or the print period.
+    """
+    indexed = {}
+    if metadata_path is not None:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        for entry in metadata["snapshots"]:
+            key = (str((metadata_path.parent / entry["log"]).resolve()), int(entry["line"]))
+            if key in indexed:
+                raise ValueError("Duplicate legacy Energest snapshot metadata")
+            indexed[key] = entry
+    previous, rows, snapshots, used = {}, [], 0, set()
+    for path in logs:
+        with path.open(encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, 1):
+                offset = line.find(ENERGEST_PREFIX)
+                if offset < 0:
+                    continue
+                raw = line[offset + len(ENERGEST_PREFIX):].strip()
+                if raw.startswith("{"):
+                    item = json.loads(raw)
+                else:
+                    old = dict(re.findall(r"([a-z_]+)=([^\s]+)", raw))
+                    lookup = (str(path.resolve()), line_number)
+                    if lookup not in indexed:
+                        raise ValueError(f"{path}:{line_number}: legacy ticks require explicit timestamp/rate metadata")
+                    entry = indexed[lookup]
+                    used.add(lookup)
+                    if str(entry["node_id"]) != str(old.get("node")):
+                        raise ValueError("Legacy snapshot metadata names a different node")
+                    item = {key: entry[key] for key in ("run_id", "seed", "node_id", "clock_domain", "time_us", "ticks_per_second")}
+                    item.update({state: int(old[state]) for state in ENERGEST_STATES})
+                required = {"run_id", "seed", "node_id", "clock_domain", "time_us", "ticks_per_second", *ENERGEST_STATES}
+                if not isinstance(item, dict) or not required.issubset(item):
+                    raise ValueError("Incomplete Energest snapshot")
+                for field in ("seed", "time_us", "ticks_per_second", *ENERGEST_STATES):
+                    integer(item[field], field)
+                if item["ticks_per_second"] == 0:
+                    raise ValueError("ENERGEST_SECOND must be positive")
+                for field in ("run_id", "node_id", "clock_domain"):
+                    if not isinstance(item[field], str) or not item[field].strip():
+                        raise ValueError("Energest identity and clock fields must be strings")
+                key = (item["run_id"], item["node_id"], item["clock_domain"])
+                old = previous.get(key)
+                if old is not None:
+                    if item["time_us"] <= old["time_us"] or item["ticks_per_second"] != old["ticks_per_second"] or item["seed"] != old["seed"]:
+                        raise ValueError("Energest time/rate changed; split reset clocks into new domains")
+                    for state in ENERGEST_STATES:
+                        delta = item[state] - old[state]
+                        if delta < 0:
+                            raise ValueError("Energest counter reset/wrapped; start a new clock domain")
+                        rows.append({"run_id": item["run_id"], "seed": item["seed"], "node_id": item["node_id"],
+                            "clock_domain": item["clock_domain"], "start_time_s": old["time_us"] / 1e6,
+                            "end_time_s": item["time_us"] / 1e6, "state": state, "delta_ticks": delta,
+                            "ticks_per_second": item["ticks_per_second"], "duration_s": delta / item["ticks_per_second"]})
+                previous[key] = item
+                snapshots += 1
+    if set(indexed) != used:
+        raise ValueError("Unused legacy snapshot entries; check paths and line numbers")
+    with output.open("x", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=ENERGEST_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    return {"input_logs": [{"path": str(path.resolve()), "sha256": sha256(path)} for path in logs],
+        "metadata_sha256": sha256(metadata_path) if metadata_path else None,
+        "snapshots": snapshots, "state_intervals": len(rows), "output_sha256": sha256(output),
+        "energy_computed": False, "conversion": "adjacent cumulative delta / recorded ENERGEST_SECOND",
+        "state_overlap": "CPU and radio may overlap; supply a calibrated disjoint power model separately"}
 
 
 def artifact_path(root: Path, relative: str) -> Path:
@@ -144,6 +203,10 @@ def main() -> None:
     normalize_parser = commands.add_parser("normalize")
     normalize_parser.add_argument("--logs", nargs="+", type=Path, required=True)
     normalize_parser.add_argument("--output", type=Path, required=True)
+    energest_parser = commands.add_parser("normalize-energest")
+    energest_parser.add_argument("--logs", nargs="+", type=Path, required=True)
+    energest_parser.add_argument("--metadata", type=Path)
+    energest_parser.add_argument("--output", type=Path, required=True)
     verify_parser = commands.add_parser("verify")
     verify_parser.add_argument("--manifest", type=Path, required=True)
     verify_parser.add_argument("--root", type=Path, required=True)
@@ -151,8 +214,9 @@ def main() -> None:
     capture_parser.add_argument("--root", type=Path, required=True)
     capture_parser.add_argument("--files", nargs="+", required=True)
     args = parser.parse_args()
-    if args.command == "normalize":
-        result = normalize(args.logs, args.output)
+    if args.command in {"normalize", "normalize-energest"}:
+        result = (normalize(args.logs, args.output) if args.command == "normalize"
+                  else normalize_energest(args.logs, args.output, args.metadata))
         metadata = args.output.with_suffix(args.output.suffix + ".manifest.json")
         with metadata.open("x", encoding="utf-8") as handle:
             json.dump(result, handle, indent=2)

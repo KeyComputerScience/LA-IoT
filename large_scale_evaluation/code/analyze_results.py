@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Summarize recorded experiments and draw PNG/PDF figures without invented data.
 
 Generated as source only and not executed. Network intervals use independent
@@ -36,6 +37,19 @@ def number(value: str, label: str, minimum: float = 0) -> float:
     return result
 
 
+def optional_number(value, label: str) -> float | None:
+    """Absent instrumentation stays missing, never a favorable zero cost."""
+    return None if value is None or value == "" else number(value, label)
+
+
+COST_COLUMNS = (
+    "n_wire_bytes", "source_copy_bytes", "provisional_aggregate_bytes",
+    "control_bytes", "result_bytes", "controller_reencrypt_ms", "verification_ms",
+    "controller_recovery_ms", "controller_reconstruction_ms", "aggregation_processing_ms",
+    "bottleneck_wire_bytes", "bottleneck_load_pct", "e2e_latency_ms", "host_peak_rss_bytes",
+)
+
+
 def write_csv(path: Path, fields: tuple[str, ...], rows: list[dict]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -66,8 +80,8 @@ def energy_profile(path: Path | None, mode: str) -> dict:
     if hashlib.sha256(calibration.read_bytes()).hexdigest() != profile["calibration_artifact_sha256"]:
         raise ValueError("Calibration artifact hash does not match")
     components = profile.get("components", {})
-    scopes = [item["scope_id"] for item in components.values()]
-    if not components or len(scopes) != len(set(scopes)):
+    scopes = [item.get("physical_scope_id") or item.get("scope_id") for item in components.values()]
+    if not components or not all(scopes) or len(scopes) != len(set(scopes)):
         raise ValueError("Energy scopes must be nonempty and nonoverlapping")
     return profile
 
@@ -158,7 +172,7 @@ def summarize_rounds(rows: list[dict], energies: dict, repetitions: int, seed: i
     for row in rows:
         run_id, scheme, scenario = (row[k] for k in ("run_id", "scheme", "scenario_id"))
         key = (run_id, scheme, row["round_id"])
-        if key in seen or row["status"] not in {"complete", "timeout", "rejected"}:
+        if key in seen or row["status"] not in {"complete", "timeout", "rejected", "incomplete"}:
             raise ValueError("Duplicate round or unknown round status")
         seen.add(key)
         run_key = (run_id, scheme)
@@ -178,12 +192,15 @@ def summarize_rounds(rows: list[dict], energies: dict, repetitions: int, seed: i
             raise ValueError("Invalid participant counts")
         if row["status"] == "complete" and accepted != expected:
             raise ValueError("Complete rounds must include all expected participants")
-        row["_jct"] = number(row["jct_ms"], "round-decision duration")
-        elapsed_ms = 1000 * (number(row["decision_s"], "decision") - number(row["release_s"], "release"))
-        if elapsed_ms < 0 or abs(elapsed_ms - row["_jct"]) > max(.001, abs(elapsed_ms) * 1e-6):
-            raise ValueError("JCT does not match recorded release/decision timestamps")
-        row["_latency"] = (number(row["latency_ms"], "conditional latency")
+        row["_jct"] = optional_number(row["jct_ms"], "round-decision duration")
+        if row["_jct"] is not None:
+            elapsed_ms = 1000 * (number(row["decision_s"], "decision") - number(row["release_s"], "release"))
+            if elapsed_ms < 0 or abs(elapsed_ms - row["_jct"]) > max(.001, abs(elapsed_ms) * 1e-6):
+                raise ValueError("JCT does not match recorded release/decision timestamps")
+        row["_latency"] = (optional_number(row["latency_ms"], "conditional latency")
                            if row["status"] == "complete" else None)
+        for metric in COST_COLUMNS:
+            row["_cost_" + metric] = optional_number(row.get(metric), metric)
         runs[(scenario, scheme, run_id)].append(row)
     unknown_energy = set(energies) - set(run_scenarios)
     if unknown_energy:
@@ -192,15 +209,23 @@ def summarize_rounds(rows: list[dict], energies: dict, repetitions: int, seed: i
         raise ValueError("An energy analysis requires the complete declared set of runs")
     groups = defaultdict(list)
     for (scenario, scheme, run_id), values in runs.items():
-        groups[(scenario, scheme, "all_round_decision_ms")].append(statistics.mean(row["_jct"] for row in values))
+        if all(row["_jct"] is not None for row in values):
+            groups[(scenario, scheme, "all_round_decision_ms")].append(statistics.mean(row["_jct"] for row in values))
         complete = [row for row in values if row["status"] == "complete"]
-        if complete:
+        if complete and all(row["_jct"] is not None for row in complete):
             groups[(scenario, scheme, "completed_jct_ms")].append(statistics.mean(row["_jct"] for row in complete))
         groups[(scenario, scheme, "completion_pct")].append(
             100 * sum(row["status"] == "complete" for row in values) / len(values))
         latency = [row["_latency"] for row in values if row["_latency"] is not None]
-        if latency:
+        if latency and len(latency) == len(complete):
             groups[(scenario, scheme, "latency_ms")].append(statistics.mean(latency))
+        for metric in COST_COLUMNS:
+            # End-to-end acceptance latency is conditional on completed rounds.
+            selected = complete if metric == "e2e_latency_ms" else values
+            observed = [row["_cost_" + metric] for row in selected]
+            if observed and all(item is not None for item in observed):
+                aggregate = max(observed) if metric == "host_peak_rss_bytes" else statistics.mean(observed)
+                groups[(scenario, scheme, metric)].append(aggregate)
         if (run_id, scheme) in energies:
             groups[(scenario, scheme, "energy_mj_per_scheduled_round")].append(
                 energies[(run_id, scheme)] / len(values))
@@ -262,7 +287,7 @@ def network_figures(summary: list[dict], output: Path, energy_kind: str) -> None
     metrics = (("completed_jct_ms", "JCT of complete rounds (ms)"),
                ("energy_mj_per_scheduled_round", f"Energy (mJ / scheduled round; {energy_kind})"),
                ("completion_pct", "Complete rounds (%)"),
-               ("latency_ms", "Report latency in complete rounds (ms)"))
+               ("latency_ms", "Recorded latency in complete rounds (ms)"))
     for index, scenario in enumerate(sorted({row["scenario_id"] for row in summary})):
         figure, axes = plt.subplots(2, 2, figsize=(10, 6.5))
         for axis, (metric, label) in zip(axes.flat, metrics):
@@ -270,6 +295,16 @@ def network_figures(summary: list[dict], output: Path, energy_kind: str) -> None
             bars(axis, selected, label)
         figure.suptitle(f"Scenario: {scenario}; intervals across independent runs", fontsize=12)
         save_figure(figure, output / f"network_{energy_kind}_{index:02d}", plt)
+        cost_metrics = (("source_copy_bytes", "Original-report traffic (bytes / round)"),
+                        ("provisional_aggregate_bytes", "Relay partial traffic (bytes / round)"),
+                        ("controller_reconstruction_ms", "Controller reconstruction (ms / round)"),
+                        ("bottleneck_load_pct", "Identified bottleneck load (%)"))
+        if any(row["scenario_id"] == scenario and row["metric"] in {item[0] for item in cost_metrics} for row in summary):
+            figure, axes = plt.subplots(1, 4, figsize=(15, 4))
+            for axis, (metric, label) in zip(axes.flat, cost_metrics):
+                bars(axis, [row for row in summary if row["scenario_id"] == scenario and row["metric"] == metric], label)
+            figure.suptitle(f"Scenario: {scenario}; separate traffic and reconstruction scopes", fontsize=12)
+            save_figure(figure, output / f"accounting_{index:02d}", plt)
 
 
 def benchmark_summary(rows: list[dict], repetitions: int, seed: int) -> list[dict]:
@@ -352,8 +387,22 @@ def results_paragraph(summary: list[dict], micro: list[dict], output: Path, ener
     labels = {"completed_jct_ms": "completed-round JCT (ms)",
               "all_round_decision_ms": "all-round decision time (ms)",
               "completion_pct": r"completion rate (\%)",
-              "latency_ms": "source-to-controller report latency (ms)",
+              "latency_ms": "recorded completed-round latency (ms)",
               "energy_mj_per_scheduled_round": "energy per scheduled round (mJ)"}
+    labels.update({"n_wire_bytes": "all-hop wire traffic (bytes/round)",
+        "source_copy_bytes": "original-report wire traffic (bytes/round)",
+        "provisional_aggregate_bytes": "relay-partial wire traffic (bytes/round)",
+        "control_bytes": "control wire traffic (bytes/round)",
+        "result_bytes": "result wire traffic (bytes/round)",
+        "verification_ms": "controller verification (ms/round)",
+        "controller_recovery_ms": "controller recovery (ms/round)",
+        "controller_reencrypt_ms": "controller re-encryption (ms/round)",
+        "controller_reconstruction_ms": "controller reconstruction (ms/round)",
+        "aggregation_processing_ms": "recorded aggregation processing (ms/round)",
+        "bottleneck_wire_bytes": "identified bottleneck wire traffic (bytes/round)",
+        "bottleneck_load_pct": r"identified bottleneck load (\%)",
+        "e2e_latency_ms": "release-to-recipient acceptance latency (ms)",
+        "host_peak_rss_bytes": "peak host process memory (bytes)"})
     for scenario in sorted({row["scenario_id"] for row in summary}):
         clauses = []
         for row in summary:
@@ -451,9 +500,11 @@ def main() -> None:
     report = {"input_sha256": hashes, "bootstrap_seed": args.seed,
               "bootstrap_repetitions": args.bootstrap, "energy_kind": energy_kind,
               "missing": missing, "ind_cca_proved_by_experiment": False,
-              "latency_condition": "mean source-to-controller report latency; complete rounds only",
-              "jct_condition": "release to authorized receiver acceptance; complete rounds only",
+              "latency_condition": "recorded latency; complete rounds only; see input clock/scope metadata",
+              "jct_condition": "release to recorded terminal delivery decision; receipt confirmation may follow receiver acceptance",
               "all_round_decision_condition": "release to confirmed delivery or timeout/rejection; all scheduled rounds",
+              "cost_columns": COST_COLUMNS,
+              "missing_cost_policy": "no zero fill; a per-run metric needs all eligible round values",
               "figures": "generated only for available observations"}
     (args.output / "analysis_manifest.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     network_figures(summary, args.output, energy_kind)

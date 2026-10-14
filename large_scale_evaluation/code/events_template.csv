@@ -1,2 +1,1 @@
-run_id,seed,node_id,round_id,sequence,event,time_us,clock_domain,alpha,beta,wire_bytes,report_bytes,block_id,fragment_id,report_hash,detail
-
+run_id,seed,node_id,round_id,sequence,event,time_us,clock_domain,alpha,beta,wire_bytes,report_bytes,block_id,fragment_id,report_hash,detail,event_index,process_id,scheme,scenario_id,scope,physical_scope_id,source_id,link_id,sender,receiver,direction,traffic_class,attempt,frame_id,airtime_s,duration_ms,stage,status,n_expected,n_verified,n_accepted,participants,event_id

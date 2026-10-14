@@ -35,9 +35,11 @@ hash agreement alone is not evidence of execution or authorship.
 set. `jct_ms` is measured from round release to confirmed authenticated result
 delivery for complete rounds, or to the timeout/rejection decision for failed
 rounds. `decision_s` is the confirmed delivery time for a successful round,
-and the deadline/rejection time otherwise. `latency_ms` is supplied only for
-complete rounds, as the mean source-to-controller report latency collected
-from actual per-report logs. Record
+and the deadline/rejection time otherwise. In the new `laiot.end_to_end`
+output, `latency_ms` is an alias of `e2e_latency_ms`: round release to recipient
+acceptance, supplied only for complete rounds with a valid clock mapping.
+Historical source-to-controller latency must be kept as a separately named
+metric and must not be pooled with recipient-acceptance latency. Record
 the same clock or an independently calibrated mapping. Give every experiment
 condition a different `scenario_id`; include scale, sensitivity fraction,
 topology, attack setting, traffic rate, and timeout in the run manifest.
@@ -91,11 +93,11 @@ python analyze_results.py --rounds actual_rounds.csv --energest actual_states.cs
 python analyze_results.py --benchmark results/crypto_run01/benchmark_raw.csv --output results/crypto_figures
 ```
 
-The bundled `protocol/la_iot_cca.py` retains the sensitive-data interfaces
-(`DeviceClient.make_report`, `TrustedController` and WC helpers) and adds
-the same HKDF as the component benchmark. Version 4 domains identify its
-encoding; the older `outputs/la_iot_cca.py` is not modified.
-The network adapter neither replaces it nor changes BFV/controller semantics.
+The `protocol/` files now redirect to the canonical installed `laiot` package.
+Its version 5 report encoding authenticates the complete configuration hash,
+including calibration and encoding scales, while retaining the ML-KEM/HKDF/
+AES-GCM sensitive suite and BFV statistics. Chapter-history versions are not
+mixed into a current round. The network adapter does not change the protocol.
 Collect full-path costs separately: WC, source authentication, sensitive
 KEM/AEAD, lossless outer framing, CoAP blocks, radio fragments, source-copy
 forwarding, provisional aggregation, verification, BFV reencryption and
