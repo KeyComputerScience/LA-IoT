@@ -1,0 +1,65 @@
+{
+  "status": "template_not_executed",
+  "run_id": null,
+  "scenario_id": null,
+  "seed": null,
+  "execution_mode": null,
+  "allowed_execution_modes": ["physical_testbed", "host_crypto_profile", "cooja_network"],
+  "devices": {"pico_count": 15, "pi4_count": 3, "jetson_nano_count": 2},
+  "source_crypto_placement": null,
+  "trusted_source_processes": null,
+  "gateway_plaintext_access": null,
+  "role_process_device_map": null,
+  "contiki": {
+    "declared_release": "v4.8", "actual_commit": null,
+    "cooja_submodule_commit": null, "compiler": null, "build_command": null,
+    "platform_port_commit": null, "external_radio": null, "radio_driver_commit": null,
+    "firmware_elf_sha256": null, "linker_map_sha256": null,
+    "boot_log_sha256": null, "coap_trace_sha256": null,
+    "pico_static_ram_bytes": null, "pico_peak_stack_bytes": null,
+    "pico_peak_heap_bytes": null, "pico_reserved_bytes": null,
+    "pico_full_crypto_path_validated": false
+  },
+  "crypto": {
+    "sensitive_kem": "ML-KEM-768", "kdf": "HKDF-SHA-256", "aead": "AES-256-GCM",
+    "evaluation_packet_version": 4,
+    "watermark_mac": "HMAC-SHA-256-truncated-16-bytes",
+    "source_mac": "HMAC-SHA-256-32-bytes",
+    "bfv_degree": 8192, "bfv_plain_modulus": 1032193,
+    "actual_coefficient_moduli": null, "bfv_context_id": null,
+    "liboqs_reference_release": "0.16.0", "actual_liboqs_commit": null,
+    "liboqs_python_commit": null, "crypto_backend": null,
+    "compiler_options": null, "cpu_features_used": null
+  },
+  "reference_settings_not_measurements": {
+    "logical_sources": [50, 100, 500, 1000, 2500, 5000],
+    "total_simulation_seconds": 1800, "warmup_seconds": 300,
+    "report_intervals_seconds": [30, 60], "round_deadline_seconds": 20,
+    "tx_range_m": 35, "interference_range_m": 70,
+    "sensitive_fractions": [0, 0.25, 0.5, 0.75, 1],
+    "independent_runs_per_selected_setting": 30,
+    "component_plaintext_bytes": 96, "integrated_reference_reading_bytes": 18
+  },
+  "actual_workload": {
+    "source_count": null, "sensitive_count": null, "input_sha256": null,
+    "serializer_sha256": null, "report_interval_seconds": null,
+    "measurement_window_seconds": null, "expected_roster_sha256": null,
+    "topology_coordinates_sha256": null, "area_m2": null,
+    "connected_source_count": null, "mote_type": null,
+    "coap_block_bytes": null, "reassembly_limit_bytes": null,
+    "channel": null, "mac": null, "rpl_settings": null,
+    "queue_limits": null, "retry_limits": null,
+    "processing_profile_sha256": null, "processing_injection_method": null,
+    "attack_schedule_sha256": null, "originals_forwarded": true
+  },
+  "measurement": {
+    "clock_domain": null, "clock_mapping_sha256": null,
+    "clock_error_bound_us": null, "power_meter": null,
+    "power_sampling_hz": null, "calibration_artifact_sha256": null,
+    "energy_mode": null, "energy_unit": "mJ",
+    "component_scopes": null, "idle_subtraction": null
+  },
+  "artifacts": [],
+  "outcome": {"executed": false, "completed": null, "failure_reason": null}
+}
+

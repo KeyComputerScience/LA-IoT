@@ -1,0 +1,10 @@
+{
+  "status": "template_not_executed",
+  "mode": null,
+  "disjoint_components": false,
+  "clock_domain": null,
+  "calibration_artifact": null,
+  "calibration_artifact_sha256": null,
+  "components": {}
+}
+
