@@ -1,1 +1,0 @@
-run_id,event_id,parent_event_id,clock_domain,timestamp_ns,node_id,role,round_id,sequence,report_hash,stage,event_type,coap_transfer_id,block_index,datagram_id,fragment_index,frame_id,hop_index,attempt,bytes_at_declared_layer,declared_layer,elapsed_ns,cpu_time_ns,peak_memory_bytes,verification_status,rejection_code,result_hash
