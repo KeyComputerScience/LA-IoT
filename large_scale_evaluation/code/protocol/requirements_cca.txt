@@ -1,4 +1,0 @@
-# Source generation only: no installation or Python execution was performed.
-# cryptography 47+ supplies ML-KEM; an ML-KEM-capable backend is required.
-cryptography>=47
-tenseal

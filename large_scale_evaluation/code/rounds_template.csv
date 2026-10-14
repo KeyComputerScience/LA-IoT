@@ -1,1 +1,0 @@
-run_id,scheme,scenario_id,seed,round_id,status,release_s,decision_s,clock_domain,jct_ms,latency_ms,n_expected,n_accepted,n_wire_bytes,source_copy_bytes,provisional_aggregate_bytes,controller_reencrypt_ms,verification_ms
