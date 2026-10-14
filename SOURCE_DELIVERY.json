@@ -1,0 +1,877 @@
+{
+  "project": "LA-IoT",
+  "delivery_date": "2026-10-14",
+  "delivery_type": "source-only local supplement",
+  "repository": "https://github.com/KeyComputerScience/LA-IoT",
+  "upstream_base_commit": "354e7a2b42fca3d242a93d910b65f18472fd88f8",
+  "package_version": "0.2.0",
+  "license": "Apache-2.0",
+  "remote_changes_published": false,
+  "execution": {
+    "python_executed": false,
+    "python_imported": false,
+    "python_ast_parsed": false,
+    "python_compiled": false,
+    "tests_run": false,
+    "dependencies_installed": false,
+    "keys_generated": false,
+    "network_services_started": false,
+    "firmware_built": false,
+    "benchmarks_run": false,
+    "simulations_run": false
+  },
+  "static_checks": {
+    "git_diff_check": "passed",
+    "json_syntax_files": 10,
+    "calibration_fixture_sha256": "matched",
+    "license_text": "complete",
+    "ci_trigger": "workflow_dispatch only",
+    "generated_private_artifacts": "none found"
+  },
+  "evidence_status": "No runtime validation or measured performance is claimed. See docs/implementation-status.md.",
+  "changed_or_added_files": [
+    {
+      "status": " M",
+      "path": "Ablation Analysis/aggregation_ablation.py"
+    },
+    {
+      "status": " M",
+      "path": "Ablation Analysis/plot_aggregation_ablation.py"
+    },
+    {
+      "status": " M",
+      "path": "Authenticated Bayesian Aggregation/authenticated_bayesian_fusion.py"
+    },
+    {
+      "status": " M",
+      "path": "Authenticated Bayesian Aggregation/la_iot_bayesian.py"
+    },
+    {
+      "status": " M",
+      "path": "Authenticated Bayesian Aggregation/la_iot_cca.py"
+    },
+    {
+      "status": " M",
+      "path": "Authenticated Bayesian Aggregation/la_iot_cca_security.py"
+    },
+    {
+      "status": " M",
+      "path": "Authenticated Bayesian Aggregation/la_iot_ring_lwe.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/authenticated_bayesian_fusion.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/coap_transport.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/deployment.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/joint_watermarking_iot.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/la_iot_bayesian.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/la_iot_cca.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/la_iot_cca_security.py"
+    },
+    {
+      "status": " M",
+      "path": "IoT Application/la_iot_ring_lwe.py"
+    },
+    {
+      "status": " M",
+      "path": "README.md"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/README.md"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/analyze_results.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/events_template.csv"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/full_pipeline_profile.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/network_adapter.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/protocol/la_iot_bayesian.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/protocol/la_iot_cca.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/protocol/la_iot_cca_security.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/protocol/la_iot_ring_lwe.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/protocol/security_mechanism_workflow.py"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/code/rounds_template.csv"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/contiki/README_zh.md"
+    },
+    {
+      "status": " M",
+      "path": "large_scale_evaluation/contiki/la-iot-evidence.c"
+    },
+    {
+      "status": "??",
+      "path": ".github/workflows/manual-checks.yml"
+    },
+    {
+      "status": "??",
+      "path": ".gitignore"
+    },
+    {
+      "status": "??",
+      "path": "CHANGELOG.md"
+    },
+    {
+      "status": "??",
+      "path": "CITATION.cff"
+    },
+    {
+      "status": "??",
+      "path": "LICENSE"
+    },
+    {
+      "status": "??",
+      "path": "NOTICE"
+    },
+    {
+      "status": "??",
+      "path": "docs/baselines.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/deployment.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/experiment_logging.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/implementation-status.md"
+    },
+    {
+      "status": "??",
+      "path": "examples/README.md"
+    },
+    {
+      "status": "??",
+      "path": "examples/calibration.json"
+    },
+    {
+      "status": "??",
+      "path": "examples/sensor-input.json"
+    },
+    {
+      "status": "??",
+      "path": "examples/service-config-plan.json"
+    },
+    {
+      "status": "??",
+      "path": "examples/workloads.json"
+    },
+    {
+      "status": "??",
+      "path": "pyproject.toml"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/__init__.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/__main__.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/authenticated_bayesian_fusion.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/baselines.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/calibration.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/cli.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/coap_transport.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/config.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/deployment.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/end_to_end.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/events.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/fusion_metrics.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/joint_watermarking_iot.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/la_iot_bayesian.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/la_iot_cca.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/la_iot_cca_security.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/la_iot_ring_lwe.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/security_mechanism_workflow.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/sensor_input.py"
+    },
+    {
+      "status": "??",
+      "path": "src/laiot/services.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_calibration_metrics.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_events_accounting.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_protocol_integration.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_service_helpers.py"
+    }
+  ],
+  "file_inventory_excluding_this_manifest": [
+    {
+      "path": ".github/workflows/manual-checks.yml",
+      "bytes": 1145,
+      "sha256": "8cbe7846dadf9f5d1493ee01dc3eb931aaef431963a636769df3869902d88055"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 199,
+      "sha256": "2a442c62cc1fd0ef9d89127286e31694e3d2f3437467fe8e445a1c46bea7034a"
+    },
+    {
+      "path": "Ablation Analysis/aggregation_ablation.py",
+      "bytes": 23559,
+      "sha256": "bf7e52a640094522edab24bea8c778cbf8cc658f2e274d7044f3e037f21a2f0e"
+    },
+    {
+      "path": "Ablation Analysis/plot_aggregation_ablation.py",
+      "bytes": 29493,
+      "sha256": "010aa2710460993a23cea599112d646fc3a63621ff1cea874b01b13999dde97a"
+    },
+    {
+      "path": "Authenticated Bayesian Aggregation/authenticated_bayesian_fusion.py",
+      "bytes": 522,
+      "sha256": "402fbd67cba6a051805db637e8b120e7bed4a62809bb5292225016344135889b"
+    },
+    {
+      "path": "Authenticated Bayesian Aggregation/la_iot_bayesian.py",
+      "bytes": 480,
+      "sha256": "a7f8fb006c7c64a16bb4edf2a2c2bad7f2650b172970e5c13638c7a0623e3105"
+    },
+    {
+      "path": "Authenticated Bayesian Aggregation/la_iot_cca_security.py",
+      "bytes": 492,
+      "sha256": "9f6265ba08080b090e51e7edd618ad03537ba3394da1c1c0235a89a17d87077b"
+    },
+    {
+      "path": "Authenticated Bayesian Aggregation/la_iot_cca.py",
+      "bytes": 465,
+      "sha256": "8da40fca59b84b3cc1fbb0f13a8d0d88a40826acaa34441efd0254ee6818c994"
+    },
+    {
+      "path": "Authenticated Bayesian Aggregation/la_iot_ring_lwe.py",
+      "bytes": 480,
+      "sha256": "c38e2410d3ebb416e8c89649a9b5874139b0769f9f53d054819a842eaf6051ce"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 1171,
+      "sha256": "dbd812aeb3e17819e9917fe37ca2a35635b038179303608ea4587f3bed6348ed"
+    },
+    {
+      "path": "CITATION.cff",
+      "bytes": 329,
+      "sha256": "4755a9760c257cdc78b2ebde311d72c100c8c0111280807cdd1d6ffbee0e3348"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/implementation_notes.md",
+      "bytes": 3203,
+      "sha256": "143e4a678daf8e0c6ccc08b99281749ab32695a38c435ea83ba76c822d00992a"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/la_iot_bayesian.py",
+      "bytes": 28226,
+      "sha256": "5b9fcd395954fa36c4b6bbfac21292d79232ccdcc4e87589fbb6d555c54ccbe0"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/la_iot_cca_security.py",
+      "bytes": 28362,
+      "sha256": "42bcbf630eddc9edc4a1d9c1a34d9ec241502ae1a388f3588e9a23b6a169ff4e"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/la_iot_cca.py",
+      "bytes": 20549,
+      "sha256": "0db03717a5276036c0b8c6d29a5dd2b6089df81353028a86eaee455203150981"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/la_iot_ring_lwe.py",
+      "bytes": 12426,
+      "sha256": "05e630971006b634440469d7584455926117f3ef694b28f286324b0771c40271"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/requirements_cca.txt",
+      "bytes": 178,
+      "sha256": "f80e6db2cd73edfb9b3557aadd15ad87880ef1507ffbc93d2a82807f3e86b8b1"
+    },
+    {
+      "path": "Compression-based Lattice Encryption/requirements.txt",
+      "bytes": 134,
+      "sha256": "53e43b243288559435694372147e72729b55f2904906636da49900774a57a3f2"
+    },
+    {
+      "path": "docs/baselines.md",
+      "bytes": 2194,
+      "sha256": "a4aefa31688102af98e98bf219606e57b644650032db30f9f77ef6da87b28802"
+    },
+    {
+      "path": "docs/deployment.md",
+      "bytes": 11719,
+      "sha256": "59b6343bf2f20c90d91a99f656a5ad45f0f64b524ced85f6fc9e0e4492c11f33"
+    },
+    {
+      "path": "docs/experiment_logging.md",
+      "bytes": 8768,
+      "sha256": "dc0ad00ac516ad50972250ef189fd4c6086d52ab08afe9232b35c42d2c56068a"
+    },
+    {
+      "path": "docs/implementation-status.md",
+      "bytes": 2159,
+      "sha256": "7e69d72bf8e338edd7ed2439c0d9ae0899655a491624b02e607e4fef8c09828d"
+    },
+    {
+      "path": "examples/calibration.json",
+      "bytes": 428,
+      "sha256": "5fcd93a7ca8cb4ee59e12f88c405fb1b031906f8ce85616259494ef2a44d6317"
+    },
+    {
+      "path": "examples/README.md",
+      "bytes": 2608,
+      "sha256": "e558f55acdfdb6ab10b126aea19ecf0aaba60fd09089e9121ee81a5a6f51113a"
+    },
+    {
+      "path": "examples/sensor-input.json",
+      "bytes": 27,
+      "sha256": "fd4965994a4385dbc5fc0d41bf17a302599c5e8fb9b962e11b2abdf7467b3bdc"
+    },
+    {
+      "path": "examples/service-config-plan.json",
+      "bytes": 1365,
+      "sha256": "246359a3938b689b1f0548303d9eb7b682f19ad4782974fab71bfca2c5610960"
+    },
+    {
+      "path": "examples/workloads.json",
+      "bytes": 848,
+      "sha256": "4fc323e86ef2f62512afa57484eca76a0fef867f19ed6678b5ce48b40a048c94"
+    },
+    {
+      "path": "experiment_trace/events_template.csv",
+      "bytes": 329,
+      "sha256": "144d889bc308089ee2eafde42424dfacca6509e0bdfbba4be9d4ac9c7d6ac3d7"
+    },
+    {
+      "path": "experiment_trace/figure_provenance_template.csv",
+      "bytes": 149,
+      "sha256": "2dc8c232ae5d1f1f0c2bbc1ba02e7bbec63c8a6c5e4c93ba8ffe9fc82c47b2f4"
+    },
+    {
+      "path": "experiment_trace/README_zh.md",
+      "bytes": 6248,
+      "sha256": "fe749e821128adde5b0038bb2c4722086c95a1b89ef22a5305d48dfb2408da7e"
+    },
+    {
+      "path": "experiment_trace/run_manifest_template.json",
+      "bytes": 4796,
+      "sha256": "20f7ba21a7dab1de3447a00d5ae46fbd9b1966b5b0648c06531f1fc47521efa0"
+    },
+    {
+      "path": "experiment_trace/run_summary_template.csv",
+      "bytes": 179,
+      "sha256": "9505bf4eae6863742df6ec9f3900289db14edf0778905992a403f73a09d585a8"
+    },
+    {
+      "path": "Homomorphic Aggregation/homomor_bayes_aggregation.py",
+      "bytes": 3939,
+      "sha256": "70efb9aa208ed336ae98c6a2164c9219cc31178c8a7da0538670d17c5888fdbb"
+    },
+    {
+      "path": "Homomorphic Aggregation/implementation_notes.md",
+      "bytes": 3948,
+      "sha256": "e03801569b3c8be35513a1d1b6323d387d97aa4e648eee79f896541ff489c5ed"
+    },
+    {
+      "path": "Homomorphic Aggregation/la_iot_bayesian.py",
+      "bytes": 26607,
+      "sha256": "1358fa9d932d9701c856299b8815175a023648029232befdd45e684910060a77"
+    },
+    {
+      "path": "Homomorphic Aggregation/la_iot_ring_lwe.py",
+      "bytes": 12426,
+      "sha256": "05e630971006b634440469d7584455926117f3ef694b28f286324b0771c40271"
+    },
+    {
+      "path": "Homomorphic Aggregation/requirements.txt",
+      "bytes": 134,
+      "sha256": "53e43b243288559435694372147e72729b55f2904906636da49900774a57a3f2"
+    },
+    {
+      "path": "IoT Application/authenticated_bayesian_fusion.py",
+      "bytes": 522,
+      "sha256": "402fbd67cba6a051805db637e8b120e7bed4a62809bb5292225016344135889b"
+    },
+    {
+      "path": "IoT Application/coap_transport.py",
+      "bytes": 477,
+      "sha256": "15fa51656855867b9ae03c6a5c6c7595ca5e7f1e462b7337193aaed6fe07e51d"
+    },
+    {
+      "path": "IoT Application/delivery_manifest.json",
+      "bytes": 1396,
+      "sha256": "6563c731b894dbaf37742bcf94f40e884b8d432e53c41aebeb89faeddaeb179b"
+    },
+    {
+      "path": "IoT Application/deployment.py",
+      "bytes": 465,
+      "sha256": "e2d717d833eb678494b0e14e47257124885d82753d282b9b3267ba31ca11ae7d"
+    },
+    {
+      "path": "IoT Application/joint_watermarking_iot.py",
+      "bytes": 501,
+      "sha256": "11d7ec4572df6f783b3bf2e7cab5403df3d4854b04f5c614e11272dc9254deaa"
+    },
+    {
+      "path": "IoT Application/la_iot_bayesian.py",
+      "bytes": 480,
+      "sha256": "a7f8fb006c7c64a16bb4edf2a2c2bad7f2650b172970e5c13638c7a0623e3105"
+    },
+    {
+      "path": "IoT Application/la_iot_cca_security.py",
+      "bytes": 492,
+      "sha256": "9f6265ba08080b090e51e7edd618ad03537ba3394da1c1c0235a89a17d87077b"
+    },
+    {
+      "path": "IoT Application/la_iot_cca.py",
+      "bytes": 465,
+      "sha256": "8da40fca59b84b3cc1fbb0f13a8d0d88a40826acaa34441efd0254ee6818c994"
+    },
+    {
+      "path": "IoT Application/la_iot_ring_lwe.py",
+      "bytes": 480,
+      "sha256": "c38e2410d3ebb416e8c89649a9b5874139b0769f9f53d054819a842eaf6051ce"
+    },
+    {
+      "path": "large_scale_evaluation/baseline_parameters.csv",
+      "bytes": 749,
+      "sha256": "44218a474523ae6fb2276620b3dc4327afdfa22178f5721cb54418548f445e0e"
+    },
+    {
+      "path": "large_scale_evaluation/code/analyze_results.py",
+      "bytes": 29373,
+      "sha256": "bc21361a17aba7f3b7bb98b057c14012aeb5f996f11961fbc1ad81cb84b82285"
+    },
+    {
+      "path": "large_scale_evaluation/code/energest_template.csv",
+      "bytes": 51,
+      "sha256": "f375586a5594e9d288c21954ccc9bc2e6516f225cafbda34c05dfd374704c227"
+    },
+    {
+      "path": "large_scale_evaluation/code/energy_profile_template.json",
+      "bytes": 204,
+      "sha256": "68590f9f206f96693929d347638ba5f0dccb8706104e7eeb88e36ba9faa8e085"
+    },
+    {
+      "path": "large_scale_evaluation/code/events_template.csv",
+      "bytes": 371,
+      "sha256": "2137bad903aaad5ecbce0a25238d8bbc2d5295733e18dd392cadfa0af2341bef"
+    },
+    {
+      "path": "large_scale_evaluation/code/full_pipeline_profile.py",
+      "bytes": 10123,
+      "sha256": "dd90c040d52d54d4c07db73292b7679f90ea0434142dc293c1e3394284f14ee7"
+    },
+    {
+      "path": "large_scale_evaluation/code/network_adapter.py",
+      "bytes": 12025,
+      "sha256": "aba3ae4917fa5d6d0264b043f51945a30e2a81472c7996bfa4b2214d02cafad0"
+    },
+    {
+      "path": "large_scale_evaluation/code/power_template.csv",
+      "bytes": 53,
+      "sha256": "d8d647832052333d6fa54a4cb3c3e3b11bd02d38e53026beab4a0626001d9d19"
+    },
+    {
+      "path": "large_scale_evaluation/code/pqc_benchmark.py",
+      "bytes": 10909,
+      "sha256": "9be875407fa8901066ee3233b51f7723f85f64ee2a5f5cbadf160f786b70f497"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/la_iot_bayesian.py",
+      "bytes": 486,
+      "sha256": "d5cc5a71b55a6697a29a359c20de1d775cde9aab1e31235f7934cd1739a2f4cd"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/la_iot_cca_security.py",
+      "bytes": 498,
+      "sha256": "7482a4eafc2ebcd9fab27c5970f8ace428dd0dc73d8916b62f82a3793b919519"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/la_iot_cca.py",
+      "bytes": 471,
+      "sha256": "90be4e90832ba7367e87801ed0d30b7348a9fd09db291c22f975104d7dbb4333"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/la_iot_ring_lwe.py",
+      "bytes": 486,
+      "sha256": "5a654e890816ebcd6f207786d17a9d43e1ba3002d4015277697b8483ce6abf1a"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/README.md",
+      "bytes": 430,
+      "sha256": "195025a51452870f1707ac610e346e44a5d253ef4fd6caf3e0efc8492b5fbe16"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/requirements_cca.txt",
+      "bytes": 178,
+      "sha256": "f80e6db2cd73edfb9b3557aadd15ad87880ef1507ffbc93d2a82807f3e86b8b1"
+    },
+    {
+      "path": "large_scale_evaluation/code/protocol/security_mechanism_workflow.py",
+      "bytes": 522,
+      "sha256": "0f34b74aaf312baace2ad338315f5390a0871e5a92453328b1529727055603c6"
+    },
+    {
+      "path": "large_scale_evaluation/code/README.md",
+      "bytes": 8057,
+      "sha256": "7fd5202fe648cf4da3cd094244c917a1c9d81c694bf61d5f9bd03c8b6255558a"
+    },
+    {
+      "path": "large_scale_evaluation/code/requirements_evaluation.txt",
+      "bytes": 234,
+      "sha256": "846c8ba63a1b5b13ecf25f736fe05aa89711d2f8efcff8067b7aa3065d5e548d"
+    },
+    {
+      "path": "large_scale_evaluation/code/rounds_template.csv",
+      "bytes": 516,
+      "sha256": "042bf8b3382affa67fe14f33634dcd00880fd3a7cc2356b1a356588f0567cc23"
+    },
+    {
+      "path": "large_scale_evaluation/code/security_template.csv",
+      "bytes": 97,
+      "sha256": "e6e7bf71e0c2dd2c5eb5650e3fb106e3b12ec94c6a929a77589fbb170906a642"
+    },
+    {
+      "path": "large_scale_evaluation/contiki/la-iot-evidence.c",
+      "bytes": 3162,
+      "sha256": "1b16ac8bfb947aeca09ffeb21cd9d285b60764a74b5663fecf4328d1aab4d3b6"
+    },
+    {
+      "path": "large_scale_evaluation/contiki/Makefile",
+      "bytes": 384,
+      "sha256": "3fc18a0576671b2ebd9f59216b4af463d28987f531649dbfa2effa7522c656ff"
+    },
+    {
+      "path": "large_scale_evaluation/contiki/project-conf.h",
+      "bytes": 299,
+      "sha256": "83953373f71b4102ad86dfda9fd43f9ad3e007348b1349678a7fc0e857c7b6cb"
+    },
+    {
+      "path": "large_scale_evaluation/contiki/README_zh.md",
+      "bytes": 3351,
+      "sha256": "135d1c31660292cc17f4e8429ed3bd83cc0a211a3fc678cdeda5c760b9a7624d"
+    },
+    {
+      "path": "large_scale_evaluation/delivery_manifest.json",
+      "bytes": 5172,
+      "sha256": "59fe7bbf4f21199183422c93e65e9cda976286aa8fb6ac0383b3671b1ef1111c"
+    },
+    {
+      "path": "large_scale_evaluation/render_reference_figures.cjs",
+      "bytes": 6402,
+      "sha256": "416aaa443cd460f9867a5f489470a6b3dd0eb9d67e3df3def53c6cc706f9f0fa"
+    },
+    {
+      "path": "large_scale_evaluation/run_manifest_template.json",
+      "bytes": 3020,
+      "sha256": "e05da984f3687d4f0e674ee0d75618c050dc0e498d46c45a55c57536b97b08e3"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 10280,
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 297,
+      "sha256": "328d6cec6ce704c4b79e0e763840db3bc6ed8ae9f3e6a32ba64dae5e0249f09a"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 814,
+      "sha256": "9a742ce0242b382a6e40dad019d2b2c4271e8a2292541eeaa8ad1b3fd52861ec"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4171,
+      "sha256": "e3774ad636db6f632d2004000d9f30e04610afdaff2ba6238fb12a6f1f8ca2df"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/homomor_bayes_aggregation.py",
+      "bytes": 4000,
+      "sha256": "041f96597d874edbc782b7feb1d0f093e2f5c642ff87d9bfbea6a6aaef763911"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/implementation_notes.md",
+      "bytes": 4918,
+      "sha256": "7f853da71b9c09b86a5c19f7e8b3ed3ffe37fc49060659534ca009135c069b30"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/la_iot_bayesian.py",
+      "bytes": 28226,
+      "sha256": "5b9fcd395954fa36c4b6bbfac21292d79232ccdcc4e87589fbb6d555c54ccbe0"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/la_iot_cca_security.py",
+      "bytes": 28362,
+      "sha256": "42bcbf630eddc9edc4a1d9c1a34d9ec241502ae1a388f3588e9a23b6a169ff4e"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/la_iot_cca.py",
+      "bytes": 22966,
+      "sha256": "725f853ae0284b549c4d03bf78d855fb91d8bfe9036e8b5f3aa7d1b8f82f86b0"
+    },
+    {
+      "path": "Reversible Watermarking for Compressed Data/la_iot_ring_lwe.py",
+      "bytes": 12426,
+      "sha256": "05e630971006b634440469d7584455926117f3ef694b28f286324b0771c40271"
+    },
+    {
+      "path": "Security Analysis/la_iot_bayesian.py",
+      "bytes": 28226,
+      "sha256": "5b9fcd395954fa36c4b6bbfac21292d79232ccdcc4e87589fbb6d555c54ccbe0"
+    },
+    {
+      "path": "Security Analysis/la_iot_ring_lwe.py",
+      "bytes": 12426,
+      "sha256": "05e630971006b634440469d7584455926117f3ef694b28f286324b0771c40271"
+    },
+    {
+      "path": "Security Analysis/la_iot_security.py",
+      "bytes": 27655,
+      "sha256": "37365e5a1fa9c54d4edd4e13fb5df7d2e3a5fec28289d571700d76ef090e89dc"
+    },
+    {
+      "path": "Security Analysis/requirements.txt",
+      "bytes": 134,
+      "sha256": "53e43b243288559435694372147e72729b55f2904906636da49900774a57a3f2"
+    },
+    {
+      "path": "Security Analysis/security_mechanism_workflow.py",
+      "bytes": 8788,
+      "sha256": "a848831dd0f397a76185aea411260a16997b50fba96893e6b651ea3ef026a011"
+    },
+    {
+      "path": "snapshot_metadata.json",
+      "bytes": 151,
+      "sha256": "1fcd6a54464e749bd5e24dc4cd09c22f53c3fdfb8ac1c0fd0728b95807c7927a"
+    },
+    {
+      "path": "src/laiot/__init__.py",
+      "bytes": 100,
+      "sha256": "7b55c301e3cc5638f87f80edc1110a19d5ef5f787f812c29c1099646b95b2fe9"
+    },
+    {
+      "path": "src/laiot/__main__.py",
+      "bytes": 185,
+      "sha256": "4af4ca9518714543b4a170bba07b536f0b71b589be6a426a3a2423ff0b954762"
+    },
+    {
+      "path": "src/laiot/authenticated_bayesian_fusion.py",
+      "bytes": 7212,
+      "sha256": "2758e2bcfdca9123db93b9e5b0ecb3e4d7270e4025ad79b754bbcc17d4b107e4"
+    },
+    {
+      "path": "src/laiot/baselines.py",
+      "bytes": 8517,
+      "sha256": "fd48385094ef60987a5a40c469271ecc114cff99b1842203acc27a4bf40909db"
+    },
+    {
+      "path": "src/laiot/calibration.py",
+      "bytes": 7412,
+      "sha256": "335e19366ab540b44a82e5cdb869e80090b2a8f90e57721ea594b3a1168c3620"
+    },
+    {
+      "path": "src/laiot/cli.py",
+      "bytes": 5371,
+      "sha256": "876170c8ccf67ec84ff2bf4e63f77ed1793ea103c23aed7e2b99e8cc8999d28a"
+    },
+    {
+      "path": "src/laiot/coap_transport.py",
+      "bytes": 20914,
+      "sha256": "0e2ebad10c3027da4316d2de716cd94a29c7b6a02bbb87381e7bbecc267cd731"
+    },
+    {
+      "path": "src/laiot/config.py",
+      "bytes": 17240,
+      "sha256": "e80259209281e533c2cbb2ef7b8f6286d1943065ce0ac7ecabe9d31b5497dfb7"
+    },
+    {
+      "path": "src/laiot/deployment.py",
+      "bytes": 4914,
+      "sha256": "8bb6401c32fe28578bba20e7193a9e2889e5b77a230403212bee5b0f6acb27f4"
+    },
+    {
+      "path": "src/laiot/end_to_end.py",
+      "bytes": 18816,
+      "sha256": "96f2e699ec3b96451225db08e711256dde2944ccd3da03a792abf99dc6082074"
+    },
+    {
+      "path": "src/laiot/events.py",
+      "bytes": 12692,
+      "sha256": "19d5a2258805b217a37c497741c98aa525cbfcb0efec4957db729ce14e6d1d86"
+    },
+    {
+      "path": "src/laiot/fusion_metrics.py",
+      "bytes": 2927,
+      "sha256": "50f8afb05e430bcdec20b24e23391c4cc4cbe78cca96c440e184c2c9bc472e62"
+    },
+    {
+      "path": "src/laiot/joint_watermarking_iot.py",
+      "bytes": 8667,
+      "sha256": "3a07b010c700d58bb681d756f4180b2d92e35e2b9b635fec0ea213518ed57174"
+    },
+    {
+      "path": "src/laiot/la_iot_bayesian.py",
+      "bytes": 30371,
+      "sha256": "acb11f2f3973b827aa433f2982b3e9d3608b5bb78520f8784e16d4eb6d4d4e6b"
+    },
+    {
+      "path": "src/laiot/la_iot_cca_security.py",
+      "bytes": 30965,
+      "sha256": "f7786a5c8a822a8d9866ad2f5ab84025c57491d19f3f35fde735560bc74d09c1"
+    },
+    {
+      "path": "src/laiot/la_iot_cca.py",
+      "bytes": 25229,
+      "sha256": "61fc4c779c639c58123303e3f42b348a3c1d91eb81fb0a8e59b38f814739b9ab"
+    },
+    {
+      "path": "src/laiot/la_iot_ring_lwe.py",
+      "bytes": 12536,
+      "sha256": "98a0c923c7a2ff3ca23e44359abf0cce5da34b43147cc83f3db04d57e12ff9c7"
+    },
+    {
+      "path": "src/laiot/security_mechanism_workflow.py",
+      "bytes": 8957,
+      "sha256": "431be76a6dec34c1497e312aa5009bae57a1c1b12cb62c030203554b7424fb86"
+    },
+    {
+      "path": "src/laiot/sensor_input.py",
+      "bytes": 2231,
+      "sha256": "995d5b8d388429689d99c87789e0cbb5a15e43ef4c7aabc01304343fee9906a4"
+    },
+    {
+      "path": "src/laiot/services.py",
+      "bytes": 37880,
+      "sha256": "17f27fd577976e4d76e91531a4a5d351936757916e7953221ec04eacb7de85a9"
+    },
+    {
+      "path": "tests/test_calibration_metrics.py",
+      "bytes": 7124,
+      "sha256": "efa1473b5c542b3e6333f4114fb3a1fca092375afd6e100ac4bb8c68af5afe9e"
+    },
+    {
+      "path": "tests/test_events_accounting.py",
+      "bytes": 12160,
+      "sha256": "584bc54607dd6cebdd34f999fbc81c4fdb89ef4def3e3031e1e20c8e2b91e3fc"
+    },
+    {
+      "path": "tests/test_protocol_integration.py",
+      "bytes": 9836,
+      "sha256": "f39e5fb8a2c5c7902e7ff5a930224b11f18d4dce32ed082ce89c53ca1cd5354e"
+    },
+    {
+      "path": "tests/test_service_helpers.py",
+      "bytes": 5861,
+      "sha256": "1dfa0664be04a3da2f1fce37d11a26839e0eb353d7032164a864ea6e2b21d032"
+    }
+  ]
+}
