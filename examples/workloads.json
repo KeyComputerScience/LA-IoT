@@ -1,0 +1,22 @@
+{
+  "runs": [
+    {
+      "pair_id": "synthetic-schema-example-001",
+      "seed": 7,
+      "prior_mean": 200,
+      "prior_precision": 1,
+      "truth": ["200", "200", "200", "200"],
+      "prior_case": "synthetic-centered-prior",
+      "variance_provenance": "Configuration example only; no measured results. Reading scale 10, precision scale 4; see calibration.json.",
+      "reading_scale": 10,
+      "precision_scale": 4,
+      "equal_weight_precision": 10,
+      "unit": "degree_C",
+      "calibration_sha256": "5fcd93a7ca8cb4ee59e12f88c405fb1b031906f8ce85616259494ef2a44d6317",
+      "sources": [
+        {"node": "sensor-a", "alpha": 1, "precision": 16, "readings": [199, 201, 200, 198], "relay": "relay-1"},
+        {"node": "sensor-b", "alpha": 0, "precision": 4, "readings": [210, 190, 205, 195], "relay": "relay-1"}
+      ]
+    }
+  ]
+}

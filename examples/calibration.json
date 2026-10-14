@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "unit": "degree_C",
+  "reading_scale": 10,
+  "precision_scale": 4,
+  "prior_mean": "20",
+  "prior_variance": "4",
+  "provenance": "Synthetic configuration fixture only; not a measured calibration or experiment result.",
+  "sensors": [
+    {"node_id": "sensor-a", "gain": "1", "offset": "0", "variance": "1/4"},
+    {"node_id": "sensor-b", "gain": "5/9", "offset": "-160/9", "variance": "81/25"}
+  ]
+}

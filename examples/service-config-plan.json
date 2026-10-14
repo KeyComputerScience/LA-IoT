@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "run_id": "host-demo-001",
+  "seed": 20261014,
+  "round_id": "round-001",
+  "controller_id": "controller-1",
+  "deadline_s": 600,
+  "protocol": {
+    "max_nodes": 4,
+    "max_abs_reading": 100,
+    "max_precision": 2,
+    "prior_mean": 0,
+    "prior_precision": 1
+  },
+  "policies": {
+    "sensor-1": {"alpha": 1, "precision": 2, "sequence": 1},
+    "sensor-2": {"alpha": 0, "precision": 1, "sequence": 1},
+    "sensor-3": {"alpha": 1, "precision": 1, "sequence": 1},
+    "sensor-4": {"alpha": 0, "precision": 2, "sequence": 1}
+  },
+  "sources": {
+    "sensor-1": {"upstream_uri": "coap://[::1]:5684/laiot/reports"},
+    "sensor-2": {"upstream_uri": "coap://[::1]:5684/laiot/reports"},
+    "sensor-3": {"upstream_uri": "coap://[::1]:5684/laiot/reports"},
+    "sensor-4": {"upstream_uri": "coap://[::1]:5684/laiot/reports"}
+  },
+  "controller": {
+    "bind_host": "::1",
+    "bind_port": 5683,
+    "recipient_uri": "coap://[::1]:5685/laiot/reports"
+  },
+  "recipient": {"bind_host": "::1", "bind_port": 5685},
+  "relays": {
+    "regional-1": {
+      "bind_host": "::1",
+      "bind_port": 5684,
+      "controller_uri": "coap://[::1]:5683/laiot/reports",
+      "participants": ["sensor-1", "sensor-2", "sensor-3", "sensor-4"],
+      "partial_deadline_s": 30,
+      "max_cache_bytes": 67108864
+    }
+  },
+  "transport": {"block_size": 64}
+}
